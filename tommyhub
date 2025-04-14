@@ -1,123 +1,78 @@
--- Tạo GUI
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "TommyHub"
-ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+-- Auto Farm Theo Level
+local plr = game.Players.LocalPlayer
+repeat wait() until plr.Character
+local chr = plr.Character
+local hrp = chr:WaitForChild("HumanoidRootPart")
 
--- Nút bật/tắt menu
-local ToggleButton = Instance.new("ImageButton")
-ToggleButton.Name = "ToggleButton"
-ToggleButton.Image = "rbxassetid://14507625304" -- Hình ảnh nút
-ToggleButton.Size = UDim2.new(0, 50, 0, 50)
-ToggleButton.Position = UDim2.new(0, 10, 0, 10)
-ToggleButton.BackgroundTransparency = 1
-ToggleButton.Parent = ScreenGui
+-- Tự bật haki
+function enableHaki()
+    local args = {
+        [1] = "Buso"
+    }
+    game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer(unpack(args))
+end
 
--- Khung chính của menu
-local MainFrame = Instance.new("Frame")
-MainFrame.Name = "MainFrame"
-MainFrame.Size = UDim2.new(0, 200, 0, 250)
-MainFrame.Position = UDim2.new(0, 70, 0, 10)
-MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-MainFrame.BorderSizePixel = 0
-MainFrame.Visible = true
-MainFrame.Parent = ScreenGui
+-- Danh sách quái theo level
+local mobList = {
+    {Level = 10, Name = "Bandit", Pos = CFrame.new(1036, 17, 1547)},
+    {Level = 15, Name = "Monkey", Pos = CFrame.new(-1602, 36, 146)},
+    {Level = 30, Name = "Pirate", Pos = CFrame.new(-1115, 14, 3938)},
+    {Level = 60, Name = "Desert Bandit", Pos = CFrame.new(932, 7, 4486)},
+    {Level = 90, Name = "Snow Bandit", Pos = CFrame.new(1345, 87, -1373)},
+    -- Thêm quái khác nếu muốn
+}
 
-local UICorner = Instance.new("UICorner")
-UICorner.CornerRadius = UDim.new(0, 12)
-UICorner.Parent = MainFrame
+-- Hàm lấy quái phù hợp theo level
+function getMobByLevel(lv)
+    local mob = nil
+    for i = #mobList, 1, -1 do
+        if lv >= mobList[i].Level then
+            mob = mobList[i]
+            break
+        end
+    end
+    return mob
+end
 
--- Nút Auto Farm Token
-local AutoFarmTokenButton = Instance.new("TextButton")
-AutoFarmTokenButton.Name = "AutoFarmTokenButton"
-AutoFarmTokenButton.Size = UDim2.new(0, 180, 0, 40)
-AutoFarmTokenButton.Position = UDim2.new(0, 10, 0, 10)
-AutoFarmTokenButton.Text = "Auto Farm Token: OFF"
-AutoFarmTokenButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-AutoFarmTokenButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-AutoFarmTokenButton.Font = Enum.Font.GothamBold
-AutoFarmTokenButton.TextSize = 16
-AutoFarmTokenButton.Parent = MainFrame
+-- Tìm quái trong workspace
+function getEnemy(name)
+    for _, v in pairs(game:GetService("Workspace").Enemies:GetChildren()) do
+        if v.Name == name and v:FindFirstChild("HumanoidRootPart") and v.Humanoid.Health > 0 then
+            return v
+        end
+    end
+end
 
--- Nút Auto Collect Lucky Boxes
-local AutoCollectBoxesButton = Instance.new("TextButton")
-AutoCollectBoxesButton.Name = "AutoCollectBoxesButton"
-AutoCollectBoxesButton.Size = UDim2.new(0, 180, 0, 40)
-AutoCollectBoxesButton.Position = UDim2.new(0, 10, 0, 60)
-AutoCollectBoxesButton.Text = "Auto Collect Boxes: OFF"
-AutoCollectBoxesButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-AutoCollectBoxesButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-AutoCollectBoxesButton.Font = Enum.Font.GothamBold
-AutoCollectBoxesButton.TextSize = 16
-AutoCollectBoxesButton.Parent = MainFrame
+-- Bắt đầu Auto Farm
+_G.AutoFarm = true
+spawn(function()
+    while _G.AutoFarm do
+        pcall(function()
+            enableHaki()
 
--- Nút Auto Use Power-Up
-local AutoUsePowerUpButton = Instance.new("TextButton")
-AutoUsePowerUpButton.Name = "AutoUsePowerUpButton"
-AutoUsePowerUpButton.Size = UDim2.new(0, 180, 0, 40)
-AutoUsePowerUpButton.Position = UDim2.new(0, 10, 0, 110)
-AutoUsePowerUpButton.Text = "Auto Use Power-Up: OFF"
-AutoUsePowerUpButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-AutoUsePowerUpButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-AutoUsePowerUpButton.Font = Enum.Font.GothamBold
-AutoUsePowerUpButton.TextSize = 16
-AutoUsePowerUpButton.Parent = MainFrame
+            local level = plr.Data.Level.Value
+            local mobData = getMobByLevel(level)
 
--- Nút Teleport to NPC
-local TeleportNPCButton = Instance.new("TextButton")
-TeleportNPCButton.Name = "TeleportNPCButton"
-TeleportNPCButton.Size = UDim2.new(0, 180, 0, 40)
-TeleportNPCButton.Position = UDim2.new(0, 10, 0, 160)
-TeleportNPCButton.Text = "Teleport to NPC"
-TeleportNPCButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-TeleportNPCButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-TeleportNPCButton.Font = Enum.Font.GothamBold
-TeleportNPCButton.TextSize = 16
-TeleportNPCButton.Parent = MainFrame
-
--- Biến trạng thái
-local autoFarmToken = false
-local autoCollectBoxes = false
-local autoUsePowerUp = false
-
--- Chức năng bật/tắt menu
-ToggleButton.MouseButton1Click:Connect(function()
-	MainFrame.Visible = not MainFrame.Visible
-end)
-
--- Chức năng Auto Farm Token
-AutoFarmTokenButton.MouseButton1Click:Connect(function()
-	autoFarmToken = not autoFarmToken
-	AutoFarmTokenButton.Text = "Auto Farm Token: " .. (autoFarmToken and "ON" or "OFF")
-	
-	while autoFarmToken do
-		-- Thêm mã tự động farm token tại đây
-		wait(1)
-	end
-end)
-
--- Chức năng Auto Collect Lucky Boxes
-AutoCollectBoxesButton.MouseButton1Click:Connect(function()
-	autoCollectBoxes = not autoCollectBoxes
-	AutoCollectBoxesButton.Text = "Auto Collect Boxes: " .. (autoCollectBoxes and "ON" or "OFF")
-	
-	while autoCollectBoxes do
-		-- Thêm mã tự động thu thập Lucky Boxes tại đây
-		wait(1)
-	end
-end)
-
--- Chức năng Auto Use Power-Up
-AutoUsePowerUpButton.MouseButton1Click:Connect(function()
-	autoUsePowerUp = not autoUsePowerUp
-	AutoUsePowerUpButton.Text = "Auto Use Power-Up: " .. (autoUsePowerUp and "ON" or "OFF")
-	
-	while autoUsePowerUp do
-		-- Thêm mã tự động sử dụng Power-Up tại đây
-		wait(1)
-	end
-end)
-
--- Chức năng Teleport to NPC
-TeleportNPCButton.MouseButton1Click:Connect(function()
-	-- Thêm mã dịch chuyển đến NPC tại đây
+            if mobData then
+                local enemy = getEnemy(mobData.Name)
+                if enemy then
+                    repeat
+                        if enemy.Humanoid.Health > 0 then
+                            hrp.CFrame = enemy.HumanoidRootPart.CFrame * CFrame.new(0, 20, 0) -- bay phía trên
+                            wait(0.15)
+                            -- Tấn công
+                            game:GetService("VirtualInputManager"):SendKeyEvent(true, "Z", false, game)
+                            game:GetService("VirtualInputManager"):SendKeyEvent(false, "Z", false, game)
+                        end
+                        wait()
+                    until enemy.Humanoid.Health <= 0 or not _G.AutoFarm
+                else
+                    -- Teleport đến khu vực quái
+                    hrp.CFrame = mobData.Pos + Vector3.new(0, 10, 0)
+                    wait(1)
+                end
+            end
+        end)
+        wait()
+    end
 end)
