@@ -1,0 +1,123 @@
+-- Tạo GUI
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "TommyHub"
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+-- Nút bật/tắt menu
+local ToggleButton = Instance.new("ImageButton")
+ToggleButton.Name = "ToggleButton"
+ToggleButton.Image = "rbxassetid://14507625304" -- Hình ảnh nút
+ToggleButton.Size = UDim2.new(0, 50, 0, 50)
+ToggleButton.Position = UDim2.new(0, 10, 0, 10)
+ToggleButton.BackgroundTransparency = 1
+ToggleButton.Parent = ScreenGui
+
+-- Khung chính của menu
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Size = UDim2.new(0, 200, 0, 250)
+MainFrame.Position = UDim2.new(0, 70, 0, 10)
+MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+MainFrame.BorderSizePixel = 0
+MainFrame.Visible = true
+MainFrame.Parent = ScreenGui
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 12)
+UICorner.Parent = MainFrame
+
+-- Nút Auto Farm Token
+local AutoFarmTokenButton = Instance.new("TextButton")
+AutoFarmTokenButton.Name = "AutoFarmTokenButton"
+AutoFarmTokenButton.Size = UDim2.new(0, 180, 0, 40)
+AutoFarmTokenButton.Position = UDim2.new(0, 10, 0, 10)
+AutoFarmTokenButton.Text = "Auto Farm Token: OFF"
+AutoFarmTokenButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+AutoFarmTokenButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+AutoFarmTokenButton.Font = Enum.Font.GothamBold
+AutoFarmTokenButton.TextSize = 16
+AutoFarmTokenButton.Parent = MainFrame
+
+-- Nút Auto Collect Lucky Boxes
+local AutoCollectBoxesButton = Instance.new("TextButton")
+AutoCollectBoxesButton.Name = "AutoCollectBoxesButton"
+AutoCollectBoxesButton.Size = UDim2.new(0, 180, 0, 40)
+AutoCollectBoxesButton.Position = UDim2.new(0, 10, 0, 60)
+AutoCollectBoxesButton.Text = "Auto Collect Boxes: OFF"
+AutoCollectBoxesButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+AutoCollectBoxesButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+AutoCollectBoxesButton.Font = Enum.Font.GothamBold
+AutoCollectBoxesButton.TextSize = 16
+AutoCollectBoxesButton.Parent = MainFrame
+
+-- Nút Auto Use Power-Up
+local AutoUsePowerUpButton = Instance.new("TextButton")
+AutoUsePowerUpButton.Name = "AutoUsePowerUpButton"
+AutoUsePowerUpButton.Size = UDim2.new(0, 180, 0, 40)
+AutoUsePowerUpButton.Position = UDim2.new(0, 10, 0, 110)
+AutoUsePowerUpButton.Text = "Auto Use Power-Up: OFF"
+AutoUsePowerUpButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+AutoUsePowerUpButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+AutoUsePowerUpButton.Font = Enum.Font.GothamBold
+AutoUsePowerUpButton.TextSize = 16
+AutoUsePowerUpButton.Parent = MainFrame
+
+-- Nút Teleport to NPC
+local TeleportNPCButton = Instance.new("TextButton")
+TeleportNPCButton.Name = "TeleportNPCButton"
+TeleportNPCButton.Size = UDim2.new(0, 180, 0, 40)
+TeleportNPCButton.Position = UDim2.new(0, 10, 0, 160)
+TeleportNPCButton.Text = "Teleport to NPC"
+TeleportNPCButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+TeleportNPCButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+TeleportNPCButton.Font = Enum.Font.GothamBold
+TeleportNPCButton.TextSize = 16
+TeleportNPCButton.Parent = MainFrame
+
+-- Biến trạng thái
+local autoFarmToken = false
+local autoCollectBoxes = false
+local autoUsePowerUp = false
+
+-- Chức năng bật/tắt menu
+ToggleButton.MouseButton1Click:Connect(function()
+	MainFrame.Visible = not MainFrame.Visible
+end)
+
+-- Chức năng Auto Farm Token
+AutoFarmTokenButton.MouseButton1Click:Connect(function()
+	autoFarmToken = not autoFarmToken
+	AutoFarmTokenButton.Text = "Auto Farm Token: " .. (autoFarmToken and "ON" or "OFF")
+	
+	while autoFarmToken do
+		-- Thêm mã tự động farm token tại đây
+		wait(1)
+	end
+end)
+
+-- Chức năng Auto Collect Lucky Boxes
+AutoCollectBoxesButton.MouseButton1Click:Connect(function()
+	autoCollectBoxes = not autoCollectBoxes
+	AutoCollectBoxesButton.Text = "Auto Collect Boxes: " .. (autoCollectBoxes and "ON" or "OFF")
+	
+	while autoCollectBoxes do
+		-- Thêm mã tự động thu thập Lucky Boxes tại đây
+		wait(1)
+	end
+end)
+
+-- Chức năng Auto Use Power-Up
+AutoUsePowerUpButton.MouseButton1Click:Connect(function()
+	autoUsePowerUp = not autoUsePowerUp
+	AutoUsePowerUpButton.Text = "Auto Use Power-Up: " .. (autoUsePowerUp and "ON" or "OFF")
+	
+	while autoUsePowerUp do
+		-- Thêm mã tự động sử dụng Power-Up tại đây
+		wait(1)
+	end
+end)
+
+-- Chức năng Teleport to NPC
+TeleportNPCButton.MouseButton1Click:Connect(function()
+	-- Thêm mã dịch chuyển đến NPC tại đây
+end)
