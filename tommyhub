@@ -1,78 +1,58 @@
--- Auto Farm Theo Level
-local plr = game.Players.LocalPlayer
-repeat wait() until plr.Character
-local chr = plr.Character
-local hrp = chr:WaitForChild("HumanoidRootPart")
+ -- Tải thư viện UI
+loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Orion/main/source"))()
 
--- Tự bật haki
-function enableHaki()
-    local args = {
-        [1] = "Buso"
-    }
-    game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer(unpack(args))
-end
+local OrionLib = OrionLib
+local Window = OrionLib:MakeWindow({Name = "Tommy Hub", HidePremium = false, IntroEnabled = false, SaveConfig = true, ConfigFolder = "TommyConfig"})
 
--- Danh sách quái theo level
-local mobList = {
-    {Level = 10, Name = "Bandit", Pos = CFrame.new(1036, 17, 1547)},
-    {Level = 15, Name = "Monkey", Pos = CFrame.new(-1602, 36, 146)},
-    {Level = 30, Name = "Pirate", Pos = CFrame.new(-1115, 14, 3938)},
-    {Level = 60, Name = "Desert Bandit", Pos = CFrame.new(932, 7, 4486)},
-    {Level = 90, Name = "Snow Bandit", Pos = CFrame.new(1345, 87, -1373)},
-    -- Thêm quái khác nếu muốn
-}
+local autofarm = false
 
--- Hàm lấy quái phù hợp theo level
-function getMobByLevel(lv)
-    local mob = nil
-    for i = #mobList, 1, -1 do
-        if lv >= mobList[i].Level then
-            mob = mobList[i]
-            break
-        end
-    end
-    return mob
-end
+-- Tạo tab và toggle
+local MainTab = Window:MakeTab({Name = "Auto Farm", Icon = "rbxassetid://4483345998", PremiumOnly = false})
 
--- Tìm quái trong workspace
-function getEnemy(name)
-    for _, v in pairs(game:GetService("Workspace").Enemies:GetChildren()) do
-        if v.Name == name and v:FindFirstChild("HumanoidRootPart") and v.Humanoid.Health > 0 then
-            return v
-        end
-    end
-end
+MainTab:AddToggle({
+	Name = "Bật Auto Farm",
+	Default = false,
+	Save = true,
+	Callback = function(Value)
+		autofarm = Value
+	end    
+})
 
--- Bắt đầu Auto Farm
-_G.AutoFarm = true
+-- Chức năng farm
 spawn(function()
-    while _G.AutoFarm do
-        pcall(function()
-            enableHaki()
+	while task.wait(1) do
+		if autofarm then
+			-- Tìm quái theo level
+			local player = game.Players.LocalPlayer
+			local level = player.Data.Level.Value
+			local targetMob = nil
+			local targetPos = nil
 
-            local level = plr.Data.Level.Value
-            local mobData = getMobByLevel(level)
+			if level <= 10 then
+				targetMob = "Bandit"
+				targetPos = Vector3.new(1144, 17, 1630)
+			elseif level <= 50 then
+				targetMob = "Gorilla"
+				targetPos = Vector3.new(-1125, 40, 480)
+			end
 
-            if mobData then
-                local enemy = getEnemy(mobData.Name)
-                if enemy then
-                    repeat
-                        if enemy.Humanoid.Health > 0 then
-                            hrp.CFrame = enemy.HumanoidRootPart.CFrame * CFrame.new(0, 20, 0) -- bay phía trên
-                            wait(0.15)
-                            -- Tấn công
-                            game:GetService("VirtualInputManager"):SendKeyEvent(true, "Z", false, game)
-                            game:GetService("VirtualInputManager"):SendKeyEvent(false, "Z", false, game)
-                        end
-                        wait()
-                    until enemy.Humanoid.Health <= 0 or not _G.AutoFarm
-                else
-                    -- Teleport đến khu vực quái
-                    hrp.CFrame = mobData.Pos + Vector3.new(0, 10, 0)
-                    wait(1)
-                end
-            end
-        end)
-        wait()
-    end
+			if targetMob and targetPos then
+				-- Tìm quái gần nhất
+				for _, mob in pairs(workspace.Enemies:GetChildren()) do
+					if mob.Name == targetMob and mob:FindFirstChild("HumanoidRootPart") and mob.Humanoid.Health > 0 then
+						repeat
+							if not autofarm then break end
+							pcall(function()
+								player.Character:WaitForChild("HumanoidRootPart").CFrame = mob.HumanoidRootPart.CFrame * CFrame.new(0, 0, 3)
+								game:GetService("VirtualInputManager"):SendKeyEvent(true, "Z", false, game)
+							end)
+							task.wait()
+						until mob.Humanoid.Health <= 0 or not autofarm
+					end
+				end
+			end
+		end
+	end
 end)
+
+OrionLib:Init()
